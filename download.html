@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Download — Som Sem Nome</title>
+  <link rel="icon" type="image/png" href="assets/favicon.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:       #040d18;
+      --bg2:      #071628;
+      --bg3:      #0a1e38;
+      --blue:     #2e7fc2;
+      --blue-lit: #5aaae8;
+      --teal:     #1db97a;
+      --text:     #b5d4f4;
+      --text-dim: #4a6d94;
+      --white:    #e8f4ff;
+      --line:     #0d2540;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-logo-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .header-logo-text span { color: var(--teal); }
+
+    .back-link {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--blue-lit); }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .dl-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      max-width: 780px;
+      width: 100%;
+    }
+    @media (max-width: 600px) {
+      .dl-wrap { grid-template-columns: 1fr; }
+    }
+
+    /* CARD DA MÚSICA */
+    .dl-card {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .dl-cover {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      background: var(--bg3);
+      display: block;
+    }
+    .dl-cover-placeholder {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--bg3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dl-meta { padding: 1.25rem; }
+    .dl-estilo {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      color: var(--teal);
+      margin-bottom: 0.3rem;
+    }
+    .dl-titulo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .dl-artista {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* PAINEL DE DOWNLOAD */
+    .dl-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+
+    /* BANNER PUBLICIDADE */
+    .ad-zone {
+      background: var(--bg3);
+      border: 1px dashed var(--line);
+      border-radius: 6px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dim);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    /* CONTADOR */
+    .dl-counter-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .dl-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--teal);
+      margin-bottom: 0.75rem;
+    }
+
+    .dl-countdown {
+      font-family: 'Space Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      transition: color 0.3s;
+    }
+    .dl-countdown.ready { color: var(--teal); }
+
+    .dl-sub {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+      min-height: 1.2em;
+    }
+
+    /* Barra de progresso do contador */
+    .dl-progress-bar {
+      width: 100%;
+      height: 3px;
+      background: var(--line);
+      border-radius: 3px;
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .dl-progress-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+      border-radius: 3px;
+      transition: width 0.9s linear;
+    }
+
+    /* Botão de download real */
+    .btn-dl-real {
+      display: none;
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--teal);
+      color: var(--bg);
+      border: none;
+      border-radius: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-dl-real:hover { background: #24d68a; transform: translateY(-1px); }
+    .btn-dl-real.visible { display: block; }
+
+    .dl-error {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      padding: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="header-logo-text">SOM<span>.</span>SEMNOME</a>
+  <a href="index.html" class="back-link">← VOLTAR</a>
+</header>
+
+<main>
+  <div id="dlContent" class="dl-wrap" style="display:none;">
+
+    <!-- CARD DA MÚSICA -->
+    <div class="dl-card">
+      <div id="dlCoverWrap" class="dl-cover-placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2e7fc2" stroke-width="0.8" opacity="0.3">
+          <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
+      <div class="dl-meta">
+        <div class="dl-estilo" id="dlEstilo"></div>
+        <div class="dl-titulo" id="dlTitulo">—</div>
+        <div class="dl-artista" id="dlArtista">—</div>
+      </div>
+    </div>
+
+    <!-- PAINEL -->
+    <div class="dl-panel">
+
+      <!-- PUBLICIDADE -->
+      <div class="ad-zone">
+        ESPAÇO PUBLICITÁRIO<br/>COLOCA AQUI O TEU ANÚNCIO
+      </div>
+
+      <!-- CONTADOR -->
+      <div class="dl-counter-wrap">
+        <div class="dl-label">// PREPARANDO O DOWNLOAD</div>
+        <div class="dl-countdown" id="countdown">10</div>
+        <div class="dl-sub" id="dlSub">Aguarda enquanto o link é preparado...</div>
+        <div class="dl-progress-bar">
+          <div class="dl-progress-fill" id="dlProgressFill"></div>
+        </div>
+        <a class="btn-dl-real" id="btnDlReal" href="#" target="_blank">
+          ⬇ FAZER DOWNLOAD AGORA
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="dlError" class="dl-error" style="display:none;">
+    Música não encontrada. <a href="index.html" style="color:var(--blue-lit);">Voltar ao início</a>
+  </div>
+</main>
+
+<script src="js/config.js"></script>
+<script>
+  // ── Supabase manual (sem módulo ES) ─────────
+  const SUPA_URL = SSN_CONFIG.supabaseUrl;
+  const SUPA_KEY = SSN_CONFIG.supabaseKey;
+
+  async function supa(path, opts = {}) {
+    const res = await fetch(`${SUPA_URL}/rest/v1/${path}`, {
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${SUPA_KEY}`,
+        'Content-Type': 'application/json',
+        ...opts.headers
+      },
+      ...opts
+    });
+    return res.json();
+  }
+
+  // ── Buscar música ────────────────────────────
+  const params = new URLSearchParams(window.location.search);
+  const musicaId = params.get('id');
+
+  async function init() {
+    if (!musicaId) { mostrarErro(); return; }
+
+    const data = await supa(`musicas?id=eq.${musicaId}&ativo=eq.true&select=*`);
+
+    if (!data || data.length === 0) { mostrarErro(); return; }
+
+    const m = data[0];
+
+    // preencher UI
+    document.getElementById('dlTitulo').textContent  = m.titulo;
+    document.getElementById('dlArtista').textContent = m.artista;
+    if (m.estilo_musical) document.getElementById('dlEstilo').textContent = m.estilo_musical;
+
+    if (m.link_capa) {
+      document.getElementById('dlCoverWrap').innerHTML =
+        `<img class="dl-cover" src="${m.link_capa}" alt="${m.titulo}" onerror="this.parentElement.innerHTML='<div class=dl-cover-placeholder></div>'">`;
+    }
+
+    document.getElementById('dlContent').style.display = 'grid';
+
+    // configurar botão com o link real
+    document.getElementById('btnDlReal').href = m.link_download;
+
+    // iniciar contador
+    iniciarContador(m.id, m.link_download);
+  }
+
+  function iniciarContador(id, linkDownload) {
+    let segundos = 10;
+    const countEl    = document.getElementById('countdown');
+    const subEl      = document.getElementById('dlSub');
+    const fillEl     = document.getElementById('dlProgressFill');
+    const btnEl      = document.getElementById('btnDlReal');
+
+    // barra esvazia durante a contagem
+    fillEl.style.width = '100%';
+    setTimeout(() => { fillEl.style.width = '0%'; fillEl.style.transition = 'width 10s linear'; }, 50);
+
+    const timer = setInterval(async () => {
+      segundos--;
+      countEl.textContent = segundos;
+
+      if (segundos <= 3) {
+        subEl.textContent = 'Quase pronto...';
+      }
+
+      if (segundos <= 0) {
+        clearInterval(timer);
+        countEl.textContent = '✓';
+        countEl.classList.add('ready');
+        subEl.textContent = 'O teu download está pronto!';
+        btnEl.classList.add('visible');
+
+        // registar clique na base de dados
+        await registarDownload(id);
+      }
+    }, 1000);
+  }
+
+  async function registarDownload(musicaId) {
+    await supa('cliques_download', {
+      method: 'POST',
+      body: JSON.stringify({ musica_id: musicaId })
+    });
+  }
+
+  function mostrarErro() {
+    document.getElementById('dlError').style.display = 'block';
+  }
+
+  init();
+</script>
+
+</body>
+</html>
